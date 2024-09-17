@@ -62,5 +62,5 @@ async def get_songs(message: types.Message):
         await message.reply("Postlarni olishda xatolik yuz berdi.")
 
 
-if name == 'main':
+if __name__ == 'main':
     executor.start_polling(dp, skip_updates=True)
