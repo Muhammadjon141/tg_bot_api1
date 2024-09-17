@@ -29,8 +29,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # apps
     'web',
-    'teacher',
-    'adminstrator',
 ]
 
 MIDDLEWARE = [
