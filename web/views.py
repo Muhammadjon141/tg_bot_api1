@@ -1,80 +1,89 @@
 import requests
-from django.shortcuts import render, redirect, reverse
-from django.views import View
-from .forms import RegisterForm, LoginForm
-from django.http import HttpResponse, HttpResponseRedirect
-from django.contrib import messages
+from django.views import View, generic
+from django.contrib.auth.models import User
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.http import HttpResponse
+from .forms import UserRegisterForm, UserLoginForm
 
-class Index_View(View):
-    def get(self, request):
-        access_token = request.COOKIES.get('access_token')
-
-        if not access_token:
-            return HttpResponseRedirect('login')
-        headers = {
-            'Authorization': f'Bearer {access_token}'
+class Get_info_api:
+    @staticmethod
+    def get_token_login(username, password):
+        url = 'http://localhost:8001/auth/login'
+        data = {
+            "username_or_email": username,
+            "password": password
         }
-
-        response = requests.get('http://127.0.0.2:8002/auth/token/verify', headers=headers)
-
+        response = requests.post(url, json=data)
         if response.status_code == 200:
-            return HttpResponse("Siz tizimga kirdingiz va ushbu sahifaga kirishingiz mumkin!")
-        elif response.status_code == 401:
-            response = HttpResponseRedirect('/login/')
-            response.delete_cookie('access_token')
-            return response
+            token = response.json()["token"]["access_token"]
+            return token
         else:
-            return HttpResponse("Noma'lum xato yuz berdi", status=500)
-
-
-class Register_View(View):
-    def get(self, request):
-        form = RegisterForm()
-        return render(request, 'register.html', {"form": form})
-
-    def post(self, request):
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            url = "http://127.0.0.2:8002/auth/register"
-            data = {
-                "username": form.cleaned_data['username'],
-                "email": form.cleaned_data['email'],
-                "password": form.cleaned_data['password']
-            }
-            response = requests.post(url, json=data)
-            print(response.json())
-            if response.json()["status_code"] == 201:
-                return HttpResponse("User registered successfully")
-
-            else:
-                return HttpResponse(f"Error: {response.json()['detail']}")
-
+            return 'failed'
+           
+    @staticmethod
+    def get_token_register(username, email, password):
+        url = 'http://localhost:8001/auth/register'
+        data = {
+            "username": username,
+            "email": email,
+            "password": password
+        }
+        response = requests.post(url, json=data)
+        if response.status_code == 200:
+            return response.json()["token"]["access_token"]
         else:
-            return HttpResponse("Form is not valid")
+            return 'failed'    
 
+    
+class Index_View(View):
+    def get(self, request, *args, **kwargs):
+        size = int(request.GET.get('size', 4))
+        page = int(request.GET.get('page', 1))
+        url = f'http://localhost:8001/comment/comment/?size={size}&page={page}'
+        response = requests.post(url)
+        if response.status_code == 200:
+            return render(request, 'index.html', context={"comments":response})
+        else:
+            return render(request, 'index.html', context={"comments":response})
+        
 
 class Login_View(View):
-    def get(self, request):
-        form = LoginForm()
-        return render(request, 'login.html', {"form": form})
-
+    def get(self, request, *args, **kwargs):
+        return render(request, 'login.html')
+    
     def post(self, request):
-        form = LoginForm(request.POST)
+        form = UserLoginForm(request.POST)
         if form.is_valid():
-            url = "http://127.0.0.2:8002/auth/login"
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            token = Get_info_api.get_token_login(username, password)
+            request.session['auth_token'] = token
+            return redirect('home') 
+        else:
+            return render(request, 'login.html', {'form': form})
+    
+class Register_View(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'register.html')
+    
+    def post(self, request):
+        form = UserRegisterForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            url = 'http://localhost:8001/auth/register'
             data = {
-                "username_or_email": form.cleaned_data['username_or_email'],
-                "password": form.cleaned_data['password']
+                "username": username,
+                "email": email,
+                "password": password
             }
             response = requests.post(url, json=data)
-
-            if response.json()["status_code"] == 200:
-                access_token = response.json()['access_token']
-
-                response = redirect('home')
-                response.set_cookie('access_token', access_token, httponly=True)
-                return response
+            if response.status_code == 200:
+                return HttpResponse("User registered successfully!")
             else:
-                messages.error(request, "Invalid login credentials")
-
-        return render(request, 'login.html')
+                return HttpResponse(f"Error: {response.json()['detail']}")
+        else:
+            form = UserRegisterForm()
+            return render(request, 'register.html', {'form': form})
