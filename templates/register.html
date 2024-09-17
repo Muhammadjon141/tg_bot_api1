@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Sign Up Form by Colorlib</title>
+
+    <!-- Font Icon -->
+    <link rel="stylesheet" href="{% static 'log_reg/fonts/material-icon/css/material-design-iconic-font.min.css' %}">
+
+    <!-- Main css -->
+    <link rel="stylesheet" href="{% static 'log_reg/css/style.css' %}">
+</head>
+<body>
+    <div class="main">
+        <!-- Sign up form -->
+        <section class="signup">
+            <div class="container">
+                <div class="signup-content">
+                    <div class="signup-form">
+                        <h2 class="form-title">Registration</h2>
+                        <form method="POST" class="register-form" id="register-form">
+                            {% csrf_token %}
+                            {% if message == "tuldir" %}
+                            <div style="background-color: #ffdddd; border: 1px solid #f44336; color: #f44336; padding: 10px; border-radius: 2px; width: 250px; text-align: center; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                                Barcha maydonlarni to'ldiring!
+                            </div>
+                            {% endif %}
+                            <div class="form-group">
+                                <label for="first_name"><i class="zmdi zmdi-account material-icons-name"></i></label>
+                                <input type="text" name="first_name" id="first_name" value="{{value.first_name}}" placeholder="First name"/>
+                            </div>
+                            <div class="form-group">
+                                <label for="last_name"><i class="zmdi zmdi-account material-icons-name"></i></label>
+                                <input type="text" name="last_name" id="last_name" value="{{value.last_name}}" placeholder="Last name"/>
+                            </div>
+                            {% if message == 'error' %}
+                                    <div style="background-color: #ffdddd; border: 1px solid #f44336; color: #f44336; padding: 10px; border-radius: 2px; width: 250px; text-align: center; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                                       Username yoki phone_numberlik foydalanuvchi mavjud!
+                                    </div>
+                            {% endif %}
+                            <div class="form-group">
+                                <label for="username"><i class="zmdi zmdi-account material-icons-name"></i></label>
+                                <input type="text" name="username" id="username" value="{{value.username}}" placeholder="User name"/>
+                            </div>
+                            {% comment %} {% if message == 'phone' %}
+                                    <div style="background-color: #ffdddd; border: 1px solid #f44336; color: #f44336; padding: 10px; border-radius: 2px; width: 250px; text-align: center; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                                       Bunday telefon raqamlik foydalanuvchi mavjud!
+                                    </div>
+                            {% endif %} {% endcomment %}
+                            <div class="form-group">
+                                <label for="phone_number"><i class="zmdi zmdi-email"></i></label>
+                                <input type="number" name="phone_number" id="phone_number" value="{{value.phone_number}}" placeholder="Phone Number"/>
+                            </div>
+                            <div class="form-group">
+                                <label for="email"><i class="zmdi zmdi-email"></i></label>
+                                <input type="email" name="email" id="email" value="{{value.email}}" placeholder="Your Email"/>
+                            </div>
+                            <div class="form-group">
+                                <label for="password"><i class="zmdi zmdi-lock"></i></label>
+                                <input type="password" name="password" id="password" value="{{value.password}}" placeholder="Password"/>
+                            </div>
+                            {% if message == 'server' %}
+                                    <div style="background-color: #ffdddd; border: 1px solid #f44336; color: #f44336; padding: 10px; border-radius: 2px; width: 250px; text-align: center; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                                       Server bilan muammo paydo bo'ldi!
+                                    </div>
+                            {% endif %}
+                            <div class="form-group">
+                                <input type="checkbox" name="agree-term" id="agree-term" class="agree-term" />
+                                <label for="agree-term" class="label-agree-term"><span><span></span></span>I agree all statements in  <a href="#" class="term-service">Terms of service</a></label>
+                            </div>
+                            <div class="form-group form-button">
+                                <input type="submit" name="signup" id="signup" class="form-submit" value="Register"/>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="signup-image">
+                        <figure><img src="{% static 'log_reg/images/signup-image.jpg' %}" alt="sing up image"></figure>
+                        <a href="#" class="signup-image-link">I am already member</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <!-- JS -->
+    <script src="{% static 'log_reg/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'log_reg/js/main.js' %}"></script>
+</body><!-- This templates was made by Colorlib (https://colorlib.com) -->
+</html>
