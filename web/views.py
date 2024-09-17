@@ -40,7 +40,7 @@ class Index_View(View):
     def get(self, request, *args, **kwargs):
         size = int(request.GET.get('size', 4))
         page = int(request.GET.get('page', 1))
-        url = f'http://localhost:8001/comment/comment/?size={size}&page={page}'
+        url = f'http://localhost:8001/comment/comments/?size={size}&page={page}'
         response = requests.post(url)
         if response.status_code == 200:
             return render(request, 'index.html', context={"comments":response})
